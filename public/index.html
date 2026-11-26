@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Every Drop Counts</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="landing">
+    <div style="font-size:3rem">💧</div>
+    <h1>Every Drop Counts</h1>
+    <p class="tag">Five regions share one river. Take more and your team gets richer, but if the river collapses, everyone pays.</p>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Students: join a game</h2>
+        <form id="join-form">
+          <label>Game code
+            <input id="join-code" class="code-input" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" required>
+          </label>
+          <p><button class="primary big" type="submit">Join</button></p>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Teachers: create a game</h2>
+        <form id="create-form">
+          <label>Year level
+            <select id="yearLevel" name="yearLevel">
+              <option value="y4-6">Years 4 to 6 (simpler wording, no pledges)</option>
+              <option value="y7-8" selected>Years 7 to 8 (standard)</option>
+              <option value="y9-12">Years 9 to 12 (adds illegal pumping and audits)</option>
+            </select>
+          </label>
+          <label>Teams
+            <select name="teams" id="teams">
+              <option value="4">4 (the computer runs the Highlands dam)</option>
+              <option value="5" selected>5</option>
+              <option value="6">6 (adds Mountain Springs)</option>
+            </select>
+          </label>
+          <label>Seasons <input type="number" name="seasons" id="seasons" min="6" max="10" value="8"></label>
+          <label>Plan timer (seconds) <input type="number" name="planTimer" id="planTimer" min="60" max="300" step="10" value="150"></label>
+          <label class="check"><input type="checkbox" name="practice" id="practice" checked> Practice season first (no scoring)</label>
+          <p><button class="primary big" type="submit">Create game and open the board</button></p>
+          <p id="create-error" class="error"></p>
+        </form>
+        <div id="resume" class="hidden">
+          <h3>Resume a game on this computer</h3>
+          <div id="resume-list" class="row"></div>
+        </div>
+      </section>
+    </div>
+
+    <p class="disclaimer">The river in this game is fictional and the numbers are not real data. For real water management, look at the Murray–Darling Basin (mdba.gov.au) and the Bureau of Meteorology's water information.</p>
+    <p class="muted" style="font-size:0.9rem">Built for Year 7 Geography: Water in the world (AC9HG7K02, AC9HG7K04, with AC9HG7K03 in the debrief).</p>
+  </main>
+
+  <script src="/game/rules.js"></script>
+  <script src="/js/common.js"></script>
+  <script>
+    const R = EDRules;
+    const $ = (id) => document.getElementById(id);
+    $('yearLevel').addEventListener('change', () => {
+      const lvl = R.YEAR_LEVELS[$('yearLevel').value];
+      $('seasons').value = lvl.seasons;
+      $('planTimer').value = lvl.planTimer;
+    });
+    $('join-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = $('join-code').value.trim().toUpperCase();
+      if (code.length === 4) location.href = `/team.html?code=${encodeURIComponent(code)}`;
+    });
+    $('create-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('create-error').textContent = '';
+      try {
+        const body = {
+          yearLevel: $('yearLevel').value, teams: Number($('teams').value), seasons: Number($('seasons').value),
+          planTimer: Number($('planTimer').value), practice: $('practice').checked,
+        };
+        const res = await ED.post('/api/create', body);
+        ED.store.set(`ed-teacher-${res.code}`, res.teacherToken);
+        const list = JSON.parse(ED.store.get('ed-teacher-games') || '[]').filter((x) => x.code !== res.code);
+        list.unshift({ code: res.code, at: Date.now() });
+        ED.store.set('ed-teacher-games', JSON.stringify(list.slice(0, 6)));
+        location.href = `/board.html?code=${res.code}`;
+      } catch (err) { $('create-error').textContent = err.message; }
+    });
+    // Resume: the teacher's browser remembers the game codes it created.
+    (async () => {
+      const list = JSON.parse(ED.store.get('ed-teacher-games') || '[]');
+      for (const g of list) {
+        try {
+          const info = await ED.get(`/api/g/${g.code}/info`);
+          if (info.phase === 'final' && Date.now() - g.at > 6 * 3600e3) continue;
+          const b = document.createElement('a');
+          b.href = `/board.html?code=${g.code}`;
+          b.innerHTML = `<button type="button">${ED.esc(g.code)} · ${ED.esc(ED.phaseName(info.phase))}</button>`;
+          $('resume-list').appendChild(b);
+          $('resume').classList.remove('hidden');
+        } catch (e) { /* game gone */ }
+      }
+    })();
+  </script>
+</body>
+</html>

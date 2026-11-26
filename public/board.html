@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Every Drop Counts · Board</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="board">
+  <div class="board-wrap" id="wrap">
+    <header class="topbar">
+      <span class="title">💧 Every Drop Counts</span>
+      <span>Code <span class="code" id="code">····</span></span>
+      <span class="season" id="season"></span>
+      <span class="phase" id="phase"></span>
+      <span class="timer" id="timer"></span>
+    </header>
+    <div class="board-main">
+      <div class="left">
+        <div class="card river-card" id="river-card"></div>
+        <div class="card phase-card" id="phase-card"></div>
+      </div>
+      <div class="right">
+        <div class="card meters">
+          <div>
+            <svg id="gauge" viewBox="0 0 240 140" role="img" aria-label="River health"></svg>
+            <div class="gauge-label" id="gauge-label"></div>
+          </div>
+          <div class="fund">
+            <svg id="jar" viewBox="0 0 100 120" role="img" aria-label="Catchment Fund" style="width:100%;max-height:120px"></svg>
+            <div>Catchment Fund</div>
+          </div>
+        </div>
+        <div class="card scoreboard">
+          <h2>Scoreboard</h2>
+          <div id="scores"></div>
+        </div>
+      </div>
+    </div>
+    <div id="teacher-bar" class="teacher-bar hidden"></div>
+    <div id="viewer-note" class="viewer-note hidden">Viewing only. Open this board from the browser that created the game to get the teacher controls.</div>
+  </div>
+  <div id="final" class="final-overlay hidden"></div>
+  <dialog id="teams-dialog"></dialog>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="/game/rules.js"></script>
+  <script src="/game/logic.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/board.js"></script>
+</body>
+</html>
