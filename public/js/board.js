@@ -30,12 +30,12 @@
   let river = null;
   function nodeX(i, n) { return 135 + i * (700 / (n - 1)); }
   function segPath(x1, x2) { const m = (x1 + x2) / 2; return `M ${x1} ${Y} C ${m} ${Y - 45}, ${m} ${Y + 45}, ${x2} ${Y}`; }
-  function makeSeg(svg, d, labelX, labelY) {
+  function makeSeg(svg, d, labelX, labelY, anchor) {
     const g = el('g', {}, svg);
-    const bank = el('path', { d, class: 'bank', fill: 'none', stroke: '#1f5f97', 'stroke-linecap': 'round', 'stroke-width': 20 }, g);
-    const water = el('path', { d, class: 'water', fill: 'none', stroke: '#5fa8e0', 'stroke-linecap': 'round', 'stroke-width': 14 }, g);
+    const bank = el('path', { d, class: 'bank', fill: 'none', stroke: '#1d6fae', 'stroke-linecap': 'round', 'stroke-width': 20 }, g);
+    const water = el('path', { d, class: 'water', fill: 'none', stroke: '#5bb6ec', 'stroke-linecap': 'round', 'stroke-width': 14 }, g);
     const flow = el('path', { d, class: 'flowline', fill: 'none', stroke: '#fff', 'stroke-opacity': 0.55, 'stroke-width': 3, 'stroke-dasharray': '6 22' }, g);
-    const label = el('text', { x: labelX, y: labelY, 'text-anchor': 'middle', 'font-size': 30, 'font-weight': 800, fill: '#fff', stroke: '#0f2236', 'stroke-width': 6, 'paint-order': 'stroke' }, g, '');
+    const label = el('text', { x: labelX, y: labelY, 'text-anchor': anchor || 'middle', 'font-size': 30, 'font-weight': 800, fill: '#fff', stroke: '#0b2740', 'stroke-width': 7, 'stroke-linejoin': 'round', 'paint-order': 'stroke' }, g, '');
     for (const p of [bank, water, flow]) p.style.transition = 'stroke-width 0.9s ease';
     return {
       set(f, text) {
@@ -54,31 +54,33 @@
     style.textContent = '@keyframes edflow{to{stroke-dashoffset:-56}} .flowline{animation:edflow 1.4s linear infinite}';
     const n = order.length;
     // rain into the Highlands
-    el('text', { x: 200, y: 50, 'font-size': 42, 'text-anchor': 'middle' }, svg, '☁️');
-    const inflow = makeSeg(svg, `M 135 4 C 135 60, 135 120, 135 ${Y}`, 135, 80);
+    el('text', { x: 420, y: 52, 'font-size': 44, 'text-anchor': 'middle', opacity: 0.9 }, svg, '☁️');
+    el('text', { x: 470, y: 84, 'font-size': 30, 'text-anchor': 'middle', opacity: 0.7 }, svg, '☁️');
+    const inflow = makeSeg(svg, `M 135 4 C 135 60, 135 120, 135 ${Y}`, 158, 74, 'start');
     const segs = [];
     for (let i = 0; i < n - 1; i++) segs.push(makeSeg(svg, segPath(nodeX(i, n), nodeX(i + 1, n)), (nodeX(i, n) + nodeX(i + 1, n)) / 2, Y + 10));
     const sea = makeSeg(svg, `M ${nodeX(n - 1, n)} ${Y} C 900 ${Y - 25}, 940 ${Y + 25}, 1000 ${Y}`, 935, Y + 10);
-    el('text', { x: 995, y: Y - 45, 'font-size': 26, 'font-weight': 800, 'text-anchor': 'end', fill: '#1f5f97' }, svg, '🌊 Sea');
+    el('text', { x: 995, y: Y - 45, 'font-size': 26, 'font-weight': 800, 'text-anchor': 'end', fill: '#0f4c81' }, svg, '🌊 Sea');
     // dam tank
     const dam = el('g', {}, svg);
-    el('text', { x: 50, y: 34, 'font-size': 22, 'font-weight': 700, 'text-anchor': 'middle', fill: '#0f2236' }, dam, 'Dam');
-    el('rect', { x: 20, y: 42, width: 60, height: 80, rx: 6, fill: '#fff', stroke: '#0f2236', 'stroke-width': 4 }, dam);
-    const damFill = el('rect', { x: 24, y: 118, width: 52, height: 0, fill: '#5fa8e0' }, dam);
+    el('text', { x: 50, y: 34, 'font-size': 22, 'font-weight': 800, 'text-anchor': 'middle', fill: '#0d2a3f' }, dam, 'Dam');
+    el('rect', { x: 20, y: 42, width: 60, height: 80, rx: 10, fill: '#fff', stroke: '#0d2a3f', 'stroke-width': 4 }, dam);
+    const damFill = el('rect', { x: 24, y: 118, width: 52, height: 0, fill: '#5bb6ec' }, dam);
     damFill.style.transition = 'all 0.9s ease';
     const damText = el('text', { x: 50, y: 92, 'font-size': 22, 'font-weight': 800, 'text-anchor': 'middle', fill: '#0f2236', stroke: '#fff', 'stroke-width': 4, 'paint-order': 'stroke' }, dam, '');
-    el('path', { d: 'M 80 100 L 128 100', stroke: '#0f2236', 'stroke-width': 3, 'stroke-dasharray': '4 4' }, dam);
+    el('path', { d: 'M 80 100 L 128 100', stroke: '#0d2a3f', 'stroke-width': 3, 'stroke-dasharray': '4 4' }, dam);
     // regions
     const nodes = order.map((id, i) => {
       const def = R.REGIONS[id];
       const x = nodeX(i, n);
       const below = i % 2 === 0;
       const g = el('g', {}, svg);
-      el('circle', { cx: x, cy: Y, r: 36, fill: def.color, stroke: '#0f2236', 'stroke-width': 4 }, g);
+      el('circle', { cx: x, cy: Y + 4, r: 40, fill: '#0b2740', opacity: 0.18 }, g);
+      el('circle', { cx: x, cy: Y, r: 38, fill: def.color, stroke: '#fff', 'stroke-width': 6 }, g);
       el('text', { x, y: Y + 12, 'font-size': 36, 'text-anchor': 'middle' }, g, def.icon);
       const ny = below ? Y + 72 : Y - 52;
-      const name = el('text', { x, y: ny, 'font-size': 26, 'font-weight': 800, 'text-anchor': 'middle', fill: '#0f2236', stroke: '#fff', 'stroke-width': 6, 'paint-order': 'stroke' }, g, def.name);
-      const status = el('text', { x, y: below ? ny + 30 : ny - 30, 'font-size': 23, 'font-weight': 700, 'text-anchor': 'middle', fill: '#4d6175', stroke: '#fff', 'stroke-width': 6, 'paint-order': 'stroke' }, g, '');
+      const name = el('text', { x, y: ny, 'font-size': 26, 'font-weight': 800, 'text-anchor': 'middle', fill: '#0d2a3f', stroke: '#fff', 'stroke-width': 8, 'stroke-linejoin': 'round', 'paint-order': 'stroke' }, g, def.name);
+      const status = el('text', { x: i === 0 ? 8 : x, y: below ? ny + 30 : ny - 30, 'font-size': 23, 'font-weight': 700, 'text-anchor': i === 0 ? 'start' : 'middle', fill: '#557086', stroke: '#fff', 'stroke-width': 8, 'stroke-linejoin': 'round', 'paint-order': 'stroke' }, g, '');
       return { id, name, status };
     });
     river = {
@@ -91,7 +93,7 @@
       status(id, text, tone) {
         const nd = nodes.find((x) => x.id === id);
         nd.status.textContent = text;
-        nd.status.setAttribute('fill', tone === 'bad' ? '#b3261e' : tone === 'good' ? '#0b6e4f' : '#4d6175');
+        nd.status.setAttribute('fill', tone === 'bad' ? '#c0352b' : tone === 'good' ? '#0f8f76' : '#557086');
       },
     };
   }
@@ -188,11 +190,11 @@
     let s = '';
     for (const [a, b, c] of bands) s += `<path d="${arc(cx, cy, r, a, b)}" stroke="${c}" stroke-width="26" fill="none"/>`;
     // band tick labels so colour is never the only signal
-    s += `<text x="22" y="138" font-size="15" font-weight="700" fill="#0f2236">0</text><text x="206" y="138" font-size="15" font-weight="700" fill="#0f2236">100</text>`;
-    for (const t of [R.HEALTH.crisis, R.HEALTH.healthy]) { const [x1, y1] = polar(cx, cy, r - 15, t); const [x2, y2] = polar(cx, cy, r + 15, t); s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0f2236" stroke-width="3"/>`; }
+    s += `<text x="22" y="138" font-size="15" font-weight="700" fill="#0d2a3f">0</text><text x="206" y="138" font-size="15" font-weight="700" fill="#0d2a3f">100</text>`;
+    for (const t of [R.HEALTH.crisis, R.HEALTH.healthy]) { const [x1, y1] = polar(cx, cy, r - 15, t); const [x2, y2] = polar(cx, cy, r + 15, t); s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0d2a3f" stroke-width="3"/>`; }
     const [nx, ny] = polar(cx, cy, r - 20, h);
-    s += `<line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="#0f2236" stroke-width="7" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="9" fill="#0f2236"/>`;
-    s += `<text x="${cx}" y="${cy - 30}" font-size="40" font-weight="800" text-anchor="middle" fill="#0f2236">${h}</text>`;
+    s += `<line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="#0d2a3f" stroke-width="7" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="9" fill="#0d2a3f"/>`;
+    s += `<text x="${cx}" y="${cy - 30}" font-size="40" font-weight="800" text-anchor="middle" fill="#0d2a3f">${h}</text>`;
     svg.innerHTML = s;
     let delta = '';
     const sm = v.last && v.last.summary;
@@ -207,10 +209,10 @@
     const frac = Math.min(1, f / 40);
     const hgt = Math.round(84 * frac);
     $('jar').innerHTML = `
-      <rect x="30" y="4" width="40" height="10" rx="3" fill="#0f2236"/>
-      <path d="M 26 14 L 74 14 Q 92 26 90 50 L 90 104 Q 90 116 78 116 L 22 116 Q 10 116 10 104 L 10 50 Q 8 26 26 14 Z" fill="#fff" stroke="#0f2236" stroke-width="4"/>
-      <rect x="14" y="${112 - hgt}" width="72" height="${hgt}" rx="6" fill="#e9c46a"/>
-      <text x="50" y="76" font-size="30" font-weight="800" text-anchor="middle" fill="#0f2236" stroke="#fff" stroke-width="5" paint-order="stroke">${f}</text>`;
+      <rect x="30" y="4" width="40" height="10" rx="3" fill="#0d2a3f"/>
+      <path d="M 26 14 L 74 14 Q 92 26 90 50 L 90 104 Q 90 116 78 116 L 22 116 Q 10 116 10 104 L 10 50 Q 8 26 26 14 Z" fill="#fff" stroke="#0d2a3f" stroke-width="4"/>
+      <rect x="14" y="${112 - hgt}" width="72" height="${hgt}" rx="6" fill="#f6c453"/>
+      <text x="50" y="76" font-size="30" font-weight="800" text-anchor="middle" fill="#0d2a3f" stroke="#fff" stroke-width="5" paint-order="stroke">${f}</text>`;
   }
 
   // ---------- scoreboard ----------
@@ -240,8 +242,8 @@
       const joined = v.regions.filter((r) => r.playable);
       card.innerHTML = `<div class="lobby"><div class="qr" id="qr"></div><div>
         <h2>Join the game</h2>
-        <p>On a phone, tablet or laptop go to <span class="joinurl">${ED.esc(location.host)}</span> and enter the code <b class="code" style="font-size:1.2em;letter-spacing:.12em">${v.code}</b></p>
-        <p style="font-size:.8em">${joined.map((r) => `${R.REGIONS[r.id].icon} ${r.joined ? '✅' : '⬜'} ${ED.esc(R.REGIONS[r.id].name)}`).join(' &nbsp; ')}</p>
+        <p>On a phone, tablet or laptop go to <span class="joinurl">${ED.esc(location.host)}</span> and enter the code <span class="bigcode">${v.code}</span></p>
+        <div class="join-chips">${joined.map((r) => `<span class="join-chip ${r.joined ? 'on' : ''}">${R.REGIONS[r.id].icon} ${ED.esc(R.REGIONS[r.id].name)}${r.joined ? ' <span class="tick">✅</span>' : ''}</span>`).join('')}</div>
         <p class="muted" style="font-size:.6em">The river is fictional and the numbers are not real data.</p></div></div>`;
       if (window.QRCode) { new QRCode($('qr'), { text: url, width: 170, height: 170, correctLevel: QRCode.CorrectLevel.M }); }
       else $('qr').classList.add('hidden');
@@ -297,11 +299,11 @@
     s += `<rect x="50" y="${Yh(100)}" width="520" height="${Yh(R.HEALTH.healthy) - Yh(100)}" fill="#2a9d8f" opacity=".18"/>`;
     s += `<rect x="50" y="${Yh(R.HEALTH.healthy)}" width="520" height="${Yh(R.HEALTH.crisis) - Yh(R.HEALTH.healthy)}" fill="#e9c46a" opacity=".22"/>`;
     s += `<rect x="50" y="${Yh(R.HEALTH.crisis)}" width="520" height="${Yh(0) - Yh(R.HEALTH.crisis)}" fill="#c8553d" opacity=".18"/>`;
-    s += `<text x="566" y="${Yh(80)}" font-size="14" text-anchor="end" fill="#0f2236">Healthy</text><text x="566" y="${Yh(42)}" font-size="14" text-anchor="end" fill="#0f2236">Stressed</text><text x="566" y="${Yh(10)}" font-size="14" text-anchor="end" fill="#0f2236">Crisis</text>`;
-    for (const t of [0, 25, 60, 100]) s += `<text x="42" y="${Yh(t) + 5}" font-size="14" text-anchor="end" fill="#4d6175">${t}</text>`;
-    for (let i = 0; i <= n; i++) s += `<text x="${X(i)}" y="244" font-size="14" text-anchor="middle" fill="#4d6175">${i === 0 ? 'Start' : i}</text>`;
-    s += `<polyline fill="none" stroke="#1f5f97" stroke-width="4" points="${pts.map((p) => `${X(p.s)},${Yh(p.h)}`).join(' ')}"/>`;
-    for (const p of pts) s += `<circle cx="${X(p.s)}" cy="${Yh(p.h)}" r="6" fill="#1f5f97"/><text x="${X(p.s)}" y="${Yh(p.h) - 10}" font-size="13" text-anchor="middle" font-weight="700">${p.h}</text>`;
+    s += `<text x="566" y="${Yh(80)}" font-size="14" text-anchor="end" fill="#0d2a3f">Healthy</text><text x="566" y="${Yh(42)}" font-size="14" text-anchor="end" fill="#0d2a3f">Stressed</text><text x="566" y="${Yh(10)}" font-size="14" text-anchor="end" fill="#0d2a3f">Crisis</text>`;
+    for (const t of [0, 25, 60, 100]) s += `<text x="42" y="${Yh(t) + 5}" font-size="14" text-anchor="end" fill="#557086">${t}</text>`;
+    for (let i = 0; i <= n; i++) s += `<text x="${X(i)}" y="244" font-size="14" text-anchor="middle" fill="#557086">${i === 0 ? 'Start' : i}</text>`;
+    s += `<polyline fill="none" stroke="#2b8fd6" stroke-width="4" points="${pts.map((p) => `${X(p.s)},${Yh(p.h)}`).join(' ')}"/>`;
+    for (const p of pts) s += `<circle cx="${X(p.s)}" cy="${Yh(p.h)}" r="6" fill="#2b8fd6"/><text x="${X(p.s)}" y="${Yh(p.h) - 10}" font-size="13" text-anchor="middle" font-weight="700">${p.h}</text>`;
     return s + '</svg>';
   }
   function drawFinal(v) {

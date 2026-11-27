@@ -113,7 +113,7 @@
       <h3>How you score</h3><p>${ED.esc(w() === 'simple' ? d.simple : d.howScore)}</p>${riverOrderHTML()}</section>${rejoinHTML()}`;
   }
   function riverOrderHTML() {
-    return `<h3>The river, from the hills to the sea</h3><p>${view.order.map((id) => `${R.REGIONS[id].icon} ${id === me().id ? `<b>${ED.esc(R.REGIONS[id].name)}</b>` : ED.esc(R.REGIONS[id].name)}`).join(' → ')} → 🌊</p>
+    return `<h3>The river, from the hills to the sea</h3><p class="river-line">${view.order.map((id) => `<span class="r ${id === me().id ? 'me' : ''}">${R.REGIONS[id].icon} ${ED.esc(R.REGIONS[id].name)}</span>`).join('<span class="arrow">→</span>')}<span class="arrow">→</span><span class="r">🌊 Sea</span></p>
       <p class="muted">Water taken upstream is gone for everyone below it.</p>`;
   }
   function rejoinHTML() {
@@ -306,13 +306,13 @@
     return `${hz ? `<section class="card"><h2>${hz.icon} Hazard: ${hz.name}</h2><p>${ED.esc(R.word(hz, w()))}</p>${hz.response ? (ev.responded ? `<div class="goodbox">The Catchment Fund paid ${ev.cost} for ${hz.response.name}.</div>` : `<div class="warnbox">The fund could not pay for ${hz.response.name} (needed ${hz.response.cost}).</div>`) : ''}</section>` : ''}
       <section class="card"><h2>🌊 The water runs down the river</h2><div class="mini-river">${rows.map((r, i) => {
         const d = R.REGIONS[r.id];
-        return `<div class="mini-row ${r.id === me().id ? 'me' : ''}" data-i="${i}"><span>${d.icon}</span><span class="mname">${ED.esc(d.name)}</span><span><span class="mini-bar" style="width:0%" data-w="${Math.round((r.arrive / max) * 100)}">${ED.esc(r.text)}</span></span></div>`;
+        return `<div class="mini-row ${r.id === me().id ? 'me' : ''}" data-i="${i}"><span class="micon">${d.icon}</span><span class="mbody"><span class="mtop"><span class="mname">${ED.esc(d.name)}</span><span class="mtext">${ED.esc(r.text)}</span></span><span class="mini-track"><span class="mini-bar" style="width:0%" data-w="${Math.round((r.arrive / max) * 100)}"></span></span></span></div>`;
       }).join('')}</div></section>`;
   }
   function animateRelease(fresh) {
     const rows = [...document.querySelectorAll('.mini-row')];
     rows.forEach((row, i) => {
-      const show = () => { row.classList.add('shown'); const b = row.querySelector('.mini-bar'); b.style.width = `${Math.max(b.dataset.w, 45)}%`; };
+      const show = () => { row.classList.add('shown'); const b = row.querySelector('.mini-bar'); b.style.width = `${Math.max(b.dataset.w, 3)}%`; };
       if (fresh) setTimeout(show, 800 + i * 900); else show();
     });
   }

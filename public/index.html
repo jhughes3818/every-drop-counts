@@ -4,27 +4,53 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Every Drop Counts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <main class="landing">
-    <div style="font-size:3rem">💧</div>
-    <h1>Every Drop Counts</h1>
-    <p class="tag">Five regions share one river. Take more and your team gets richer, but if the river collapses, everyone pays.</p>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="drop" aria-hidden="true">💧</div>
+      <h1>Every Drop Counts</h1>
+      <p class="tag">Five regions share one river. Take more and your team gets richer, but if the river collapses, everyone pays.</p>
+      <div class="regions-strip" aria-label="The river from the hills to the sea">
+        <span class="r">⛰️ Highlands</span><span class="arrow">→</span>
+        <span class="r">🍎 Orchard Plains</span><span class="arrow">→</span>
+        <span class="r">🌾 Cotton Flats</span><span class="arrow">→</span>
+        <span class="r">🏙️ River Town</span><span class="arrow">→</span>
+        <span class="r">🦩 Delta</span><span class="arrow">→</span>
+        <span class="r">🌊 Sea</span>
+      </div>
+    </div>
+    <svg class="wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 40 C 240 80, 480 0, 720 30 S 1200 70, 1440 25 L 1440 70 L 0 70 Z" fill="#eef5fa"/>
+      <path d="M0 52 C 260 20, 520 80, 780 48 S 1240 30, 1440 50 L 1440 70 L 0 70 Z" fill="#eef5fa" opacity=".6"/>
+    </svg>
+  </header>
 
+  <main class="landing">
     <div class="grid">
-      <section class="card">
-        <h2>Students: join a game</h2>
+      <section class="card join">
+        <span class="eyebrow">Students</span>
+        <h2>Join a game</h2>
+        <p class="sub">Type the 4-letter code shown on the board.</p>
         <form id="join-form">
-          <label>Game code
-            <input id="join-code" class="code-input" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" required>
-          </label>
-          <p><button class="primary big" type="submit">Join</button></p>
+          <input id="join-code" class="code-input" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD" aria-label="Game code" required>
+          <p><button class="primary big" type="submit">Join the river</button></p>
         </form>
+        <ol class="steps">
+          <li><span class="n">1</span><span><b>Pick a region</b> along the river with your team.</span></li>
+          <li><span class="n">2</span><span><b>Plan each season:</b> how much water to take, what to build, who to trust.</span></li>
+          <li><span class="n">3</span><span><b>Watch the water run</b> and see who upstream left enough for you.</span></li>
+        </ol>
       </section>
 
-      <section class="card">
-        <h2>Teachers: create a game</h2>
+      <section class="card create">
+        <span class="eyebrow">Teachers</span>
+        <h2>Create a game</h2>
+        <p class="sub">The board opens on this screen. Put it on the projector.</p>
         <form id="create-form">
           <label>Year level
             <select id="yearLevel" name="yearLevel">
@@ -40,8 +66,10 @@
               <option value="6">6 (adds Mountain Springs)</option>
             </select>
           </label>
-          <label>Seasons <input type="number" name="seasons" id="seasons" min="6" max="10" value="8"></label>
-          <label>Plan timer (seconds) <input type="number" name="planTimer" id="planTimer" min="60" max="300" step="10" value="150"></label>
+          <div class="two">
+            <label>Seasons <input type="number" name="seasons" id="seasons" min="6" max="10" value="8"></label>
+            <label>Plan timer (s) <input type="number" name="planTimer" id="planTimer" min="60" max="300" step="10" value="150"></label>
+          </div>
           <label class="check"><input type="checkbox" name="practice" id="practice" checked> Practice season first (no scoring)</label>
           <p><button class="primary big" type="submit">Create game and open the board</button></p>
           <p id="create-error" class="error"></p>
